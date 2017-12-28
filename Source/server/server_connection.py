@@ -1,6 +1,7 @@
 import socket
 import threading
 
+game_running_flag = True
 playerconn1 = None
 playerconn2 = None  # keeps track of connection objects of clients
 player1List = []  # contains ship positions of player 1
@@ -54,6 +55,8 @@ def sendready():
 
 
 def closeconn():
+    global game_running_flag
+    game_running_flag = False
     playerconn1.close()
     playerconn2.close()
 
@@ -104,6 +107,46 @@ def checkhit(pos, player):
         return False
 
 
+def getattackposition(conn, player):
+    """
+    Gets attack position from client and sends appropriate instructions to clients
+    :param conn:
+    :param player:
+    :return:
+    """
+    while True:
+        pos = conn.recv(512)
+        if game_running_flag == False:
+            return
+        if player == 1:
+            if checkhit(pos, player):
+                if checkwin(player):
+                    return
+                playerconn1.send("hit2" + pos)
+                playerconn2.send("hit1" + pos)
+                playerconn1.send("attack")
+                playerconn2.send("wait")
+            else:
+                playerconn1.send("miss2" + pos)
+                playerconn2.send("miss1" + pos)
+                playerconn1.send("wait")
+                playerconn2.send("attack")
+        else:
+            if checkhit(pos, player):
+                if checkwin(player):
+                    return
+                playerconn1.send("hit1" + pos)
+                playerconn2.send("hit2" + pos)
+                playerconn1.send("wait")
+                playerconn2.send("attack")
+
+            else:
+                playerconn1.send("miss1" + pos)
+                playerconn2.send("miss2" + pos)
+                playerconn1.send("attack")
+                playerconn2.send("wait")
+
+
 try:
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # creates a server which listens to port 1234
     serversocket.bind(('0.0.0.0', 1234))
@@ -116,5 +159,15 @@ try:
     t2.start()
     t1.join()
     t2.join()
+    playerconn1.send("attack")  # Sends attack instruction to player 1
+    playerconn2.send("wait")  # Sends wait instruction to player 2
+    t1 = threading.Thread(target=getattackposition,
+                          args=[playerconn1, 1])  # Creates threads for both players which wait for
+    t2 = threading.Thread(target=getattackposition, args=[playerconn2, 2])  # client to send attack location
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+    print "Game Over"
 except Exception as e:
     print e.message
