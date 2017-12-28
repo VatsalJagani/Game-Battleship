@@ -120,10 +120,10 @@ def getattackposition(conn, player):
             return
         if player == 1:
             if checkhit(pos, player):
-                if checkwin(player):
-                    return
                 playerconn1.send("hit2" + pos)
                 playerconn2.send("hit1" + pos)
+                if checkwin(player):
+                    return
                 playerconn1.send("attack")
                 playerconn2.send("wait")
             else:
@@ -133,10 +133,10 @@ def getattackposition(conn, player):
                 playerconn2.send("attack")
         else:
             if checkhit(pos, player):
-                if checkwin(player):
-                    return
                 playerconn1.send("hit1" + pos)
                 playerconn2.send("hit2" + pos)
+                if checkwin(player):
+                    return
                 playerconn1.send("wait")
                 playerconn2.send("attack")
 
