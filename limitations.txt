@@ -1,4 +1,7 @@
-player should wait untill second client connects, so both player should aware of each other.
-
-list of concepts and modules used.
-
+Restart functionality is not available.
+  - Once game is over connection gets closed by both the ends and we don't have functionality of restarting game again.
+  
+  
+No Multi-Game Functionality
+  - Server can handle only one game(two players).
+  - If multiple players are trying to get connected with server at a time then first two will be given a chance to play the game.
