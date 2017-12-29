@@ -6,7 +6,9 @@ playerconn1 = None
 playerconn2 = None  # keeps track of connection objects of clients
 player1List = []  # contains ship positions of player 1
 player2List = []  # contains ship positions of player 2
-
+no_ship = 3  # total no of ships
+shipsankplayer1 = "0"
+shipsankplayer2 = "0"
 
 def getshiplocation(conn, player):
     """
@@ -19,17 +21,16 @@ def getshiplocation(conn, player):
     :param player:
     :return:
     """
+    global no_ship
     positions = str(conn.recv(512)).strip()
-    print positions
     positionlist = positions.split("|")
     if player == 1:
         for i in positionlist:
             player1List.append(i.split(","))
-        print player1List
     else:
         for i in positionlist:
             player2List.append(i.split(","))
-        print player2List
+    no_ship = len(player1List)
 
 
 def establishconnection(serversocket):
@@ -114,35 +115,43 @@ def getattackposition(conn, player):
     :param player:
     :return:
     """
+    global shipsankplayer1
+    global shipsankplayer2
     while True:
         pos = conn.recv(512)
         if game_running_flag == False:
             return
         if player == 1:
             if checkhit(pos, player):
-                playerconn1.send("hit2" + pos)
-                playerconn2.send("hit1" + pos)
+                # This instruction is sent to both client informing where hit or miss has occurred
+                # instruction starts with whether hit or miss has occurred
+                # followed by a number indicating which grid at client side should be reflected
+                # (2 for opponent 1 for player) followed by 2 numbers indicating position of attack
+                # followed by 2 numbers indicating number of ships sank of player and opponent respectively
+                shipsankplayer2=str(no_ship-len(player2List))
+                playerconn1.send("hit2" + pos+shipsankplayer1+shipsankplayer2)
+                playerconn2.send("hit1" + pos+shipsankplayer2+shipsankplayer1)
                 if checkwin(player):
                     return
                 playerconn1.send("attack")
                 playerconn2.send("wait")
             else:
-                playerconn1.send("miss2" + pos)
-                playerconn2.send("miss1" + pos)
+                playerconn1.send("miss2" + pos+shipsankplayer1+shipsankplayer2)
+                playerconn2.send("miss1" + pos+shipsankplayer2+shipsankplayer1)
                 playerconn1.send("wait")
                 playerconn2.send("attack")
         else:
             if checkhit(pos, player):
-                playerconn1.send("hit1" + pos)
-                playerconn2.send("hit2" + pos)
+                shipsankplayer1 = str(no_ship - len(player1List))
+                playerconn1.send("hit1" + pos+shipsankplayer1+shipsankplayer2)
+                playerconn2.send("hit2" + pos+shipsankplayer2+shipsankplayer1)
                 if checkwin(player):
                     return
                 playerconn1.send("wait")
                 playerconn2.send("attack")
-
             else:
-                playerconn1.send("miss1" + pos)
-                playerconn2.send("miss2" + pos)
+                playerconn1.send("miss1" + pos+shipsankplayer1+shipsankplayer2)
+                playerconn2.send("miss2" + pos+shipsankplayer2+shipsankplayer1)
                 playerconn1.send("attack")
                 playerconn2.send("wait")
 
