@@ -22,13 +22,16 @@ l_enemy_status = None
 ship_locations = ''  # This is the pattern which server accepts as ship's location
 direction = 'h'
 button_disable_flags = []
+
 button_color = ""
 bg_color = '#9d99fc'
 game_status_color = '#000000'
 player_status_color = '#a50415'
 player_color = '#043a04'
 game_name_color = '#0404d8'
-
+hit_color = '#fc0000'
+miss_color = '#00fce7'
+ship_color = '#0000ff'
 
 def disable_ready():
     """
@@ -163,12 +166,12 @@ def performOperation(instruction):
             # Change player's board
             x = int(instruction[4])
             y = int(instruction[5])
-            buttons_player[x][y].configure(bg='#fc0000')
+            buttons_player[x][y].configure(bg=hit_color)
         else:
             # Change enemy's board
             x = int(instruction[4])
             y = int(instruction[5])
-            buttons_enemy[x][y].configure(bg='#fc0000')
+            buttons_enemy[x][y].configure(bg=hit_color)
         l_player_status.configure(text="Your Ship destroyed - " + instruction[6])
         l_enemy_status.configure(text="Enemy's Ship destroyed - " + instruction[7])
     elif instruction.startswith('miss'):
@@ -178,12 +181,12 @@ def performOperation(instruction):
             # Changes in player board
             x = int(instruction[5])
             y = int(instruction[6])
-            buttons_player[x][y].configure(bg='#00fce7')
+            buttons_player[x][y].configure(bg=miss_color)
         else:
             # Change enemy's board
             x = int(instruction[5])
             y = int(instruction[6])
-            buttons_enemy[x][y].configure(bg='#00fce7')
+            buttons_enemy[x][y].configure(bg=miss_color)
         l_player_status.configure(text="Your Ship destroyed - " + instruction[7])
         l_enemy_status.configure(text="Enemy's Ship destroyed - " + instruction[8])
     elif instruction == 'win':
@@ -284,14 +287,14 @@ def setverticalposition(x, y):
                 ship_locations = ship_locations + str(x + i) + str(y) + '|'
             else:
                 ship_locations = ship_locations + str(x + i) + str(y) + ','
-            buttons_player[x + i][y].configure(bg='#0000ff')
+            buttons_player[x + i][y].configure(bg=ship_color)
             buttons_player[x + i][y]['state'] = 'disabled'
     # sets 1 block of ship vertically
     elif shipsettleflag == 1:
         shipsettleflag = shipsettleflag - 1
         ship_locations = ship_locations + str(x) + str(y)
         l_game_status.config(text="Ready")
-        buttons_player[x][y].configure(bg='#0000ff')
+        buttons_player[x][y].configure(bg=ship_color)
         buttons_player[x][y]['state'] = 'disabled'
         ready_flag = True
 
@@ -473,13 +476,21 @@ fr_bottom.grid(row=11, column=0)
 
 # Statuses
 l_player = tk.Label(fr_bottom, text="Your Realm", font=("Helvetica", 15), bg=bg_color, fg=player_color)
-l_enemy = tk.Label(fr_bottom, text="    Enemy's Realm", font=("Helvetica", 15), bg=bg_color, fg=player_color)
-l_game_name = tk.Label(fr_bottom, text="\t--- BattleShip ---  \t\t", font=("Helvetica", 20), bg=bg_color,
+l_enemy = tk.Label(fr_bottom, text=" Enemy's Realm", font=("Helvetica", 15), bg=bg_color, fg=player_color)
+l_game_name = tk.Label(fr_bottom, text="--- BattleShip ---  \t\t", font=("Helvetica", 20), bg=bg_color,
                        fg=game_name_color)
 
 l_player.grid(row=0, column=0)
 l_game_name.grid(row=0, column=2, columnspan=2, pady=3, padx=10)
 l_enemy.grid(row=0, column=5)
+
+# Information
+tk.Button(fr_bottom, text=" ", height=2, width=3, bg=ship_color).grid(row=1, column=0)
+tk.Button(fr_bottom, text=" ", height=2, width=3, bg=hit_color).grid(row=2, column=0)
+tk.Button(fr_bottom, text=" ", height=2, width=3, bg=miss_color).grid(row=3, column=0)
+tk.Label(fr_bottom, text="Ship Color", font=("Helvetica", 10), bg=bg_color).grid(row=1, column=1)
+tk.Label(fr_bottom, text="HIT Color", font=("Helvetica", 10), bg=bg_color).grid(row=2, column=1)
+tk.Label(fr_bottom, text="MISS Color", font=("Helvetica", 10), bg=bg_color).grid(row=3, column=1)
 
 # Connect to server
 connection = threading.Thread(target=connect_to_server)
