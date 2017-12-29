@@ -162,6 +162,7 @@ def performOperation(instruction):
         # Game over and player wins the game
         l_game_status.config(text="    You won  !!!   ")
         clientsocket.close()
+        disable_enemy_grid()   # Disables enemy grid when player won.
         return
     elif instruction == 'lost':
         # Game over and player lost the game
