@@ -9,7 +9,7 @@ PLAYER = '1'
 ENEMY = '2'
 ready_flag = False
 BUFFER = 512
-ip_of_server = '172.16.4.94'
+ip_of_server = '127.0.0.1'
 port = 1234
 clientsocket = None
 shipsettleflag = 3
@@ -22,12 +22,13 @@ l_enemy_status = None
 ship_locations = ''  # This is the pattern which server accepts as ship's location
 direction = 'h'
 button_disable_flags = []
-
+button_color = ""
 bg_color = '#9d99fc'
 game_status_color = '#000000'
 player_status_color = '#a50415'
 player_color = '#043a04'
 game_name_color = '#0404d8'
+
 
 def disable_ready():
     """
@@ -60,8 +61,10 @@ def enable_player_grid():
     This method enables all buttons in player's grid
     :return: Nothing
     """
+    global button_color
     for x in range(border_height):
         for y in range(border_width):
+            buttons_player[x][y].configure(background=button_color)
             buttons_player[x][y]['state'] = 'normal'
 
 
@@ -201,12 +204,13 @@ def send_ready():
     This method sends server a message when player is ready to start the game
     :return: Method returns nothing
     """
-    global clientsocket, horizontal_button, vertical_button, ship_locations
+    global clientsocket, horizontal_button, vertical_button, ship_locations, reset_button
     if ready_flag == False:
         l_game_status.config(text="Select ship positions")
         return
     horizontal_button['state'] = 'disabled'
     vertical_button['state'] = 'disabled'
+    reset_button['state'] = 'disabled'
     clientsocket.send(ship_locations)
     disable_ready()
     l_game_status.configure(text='Waiting for oppenent to be ready!')
@@ -215,6 +219,19 @@ def send_ready():
     my_thread.start()
     my_thread = threading.Thread(target=checkOperationToPerform)
     my_thread.start()
+
+
+def resetshipposition():
+    """
+    This function resets ship locations
+    :return:
+    """
+    global shipsettleflag, ready_flag, l_game_status, ship_locations
+    ship_locations = ""
+    ready_flag = False
+    shipsettleflag = 3
+    l_game_status.config(text='Select ship of 4 blocks')
+    enable_player_grid()
 
 
 def player_board_fn(x, y):
@@ -380,7 +397,8 @@ def connect_to_server():
         enable_player_grid()
         enable_ready()
         l_game_status.config(text="Select ship of 4 blocks")
-    except:
+    except Exception as e:
+        print e.message
         l_game_status.configure(text="Connection cannot be established..")
 
 
@@ -389,6 +407,9 @@ root = tk.Tk()
 root.title("Battleship")
 fr_main = tk.Frame(root, bg=bg_color)
 fr_main.pack()
+
+# Temp button for getting default background color
+button_color = tk.Button(root).cget('background')
 
 fr_upper = tk.Frame(fr_main, bg=bg_color)
 fr_upper.grid(row=0, column=0)
@@ -429,7 +450,8 @@ horizontal_button.grid(row=4, column=0, padx=15, pady=1)
 horizontal_button['state'] = 'disabled'
 vertical_button = tk.Button(fr_2, text="Vertical", height=2, width=10, command=setvertical)
 vertical_button.grid(row=5, column=0, padx=15, pady=1)
-
+reset_button = tk.Button(fr_2, text="Reset", height=2, width=10, command=resetshipposition)
+reset_button.grid(row=6, column=0, padx=15, pady=5)
 fr_3 = tk.Frame(fr_lower, bg=bg_color)
 fr_3.grid(row=0, column=7, columnspan=5, padx=10)
 
@@ -452,12 +474,12 @@ fr_bottom.grid(row=11, column=0)
 # Statuses
 l_player = tk.Label(fr_bottom, text="Your Realm", font=("Helvetica", 15), bg=bg_color, fg=player_color)
 l_enemy = tk.Label(fr_bottom, text="    Enemy's Realm", font=("Helvetica", 15), bg=bg_color, fg=player_color)
-l_game_name = tk.Label(fr_bottom, text="\t--- BattleShip ---  \t\t", font=("Helvetica", 20), bg=bg_color, fg=game_name_color)
+l_game_name = tk.Label(fr_bottom, text="\t--- BattleShip ---  \t\t", font=("Helvetica", 20), bg=bg_color,
+                       fg=game_name_color)
 
 l_player.grid(row=0, column=0)
 l_game_name.grid(row=0, column=2, columnspan=2, pady=3, padx=10)
 l_enemy.grid(row=0, column=5)
-
 
 # Connect to server
 connection = threading.Thread(target=connect_to_server)
