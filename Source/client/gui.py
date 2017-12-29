@@ -3,106 +3,174 @@ import socket
 import sys
 import threading
 
-border_width = 9
-border_height = 9
+border_width = 10
+border_height = 10
 PLAYER = '1'
 ENEMY = '2'
+
 BUFFER = 512
 ip_of_server = '172.16.4.94'
 port = 1234
 clientsocket = None
+
 buttons_player = []
 buttons_enemy = []
 ready_button = None
-ship_locations = '11,22,33|44,55|99'  # This is the pattern which server accepts as ship's location
+l_game_status = None
+l_player_status = None
+l_enemy_status = None
+ship_locations = '11|12,13'  # This is the pattern which server accepts as ship's location
 
 
-# GUI event method
 def disable_ready():
+    """
+    This method disables ready button
+    :return: Nothing
+    """
     ready_button['state'] = 'disabled'
 
-# GUI event method
+
+def enable_ready():
+    """
+    This method enables ready button
+    :return: Nothing
+    """
+    ready_button['state'] = 'normal'
+
+
 def disable_player_grid():
+    """
+    This method disables all buttons in player's grid
+    :return: Nothing
+    """
     for x in range(border_height):
         for y in range(border_width):
             buttons_player[x][y]['state'] = 'disabled'
 
-# GUI event method
+
 def enable_player_grid():
+    """
+    This method enables all buttons in player's grid
+    :return: Nothing
+    """
     for x in range(border_height):
         for y in range(border_width):
             buttons_player[x][y]['state'] = 'normal'
 
-# GUI event method
+
 def disable_enemy_grid():
+    """
+    This method disables all buttons in enemy's grid
+    :return: Nothing
+    """
     for x in range(border_height):
         for y in range(border_width):
             buttons_enemy[x][y]['state'] = 'disabled'
 
-# GUI event method
+
 def enable_enemy_grid():
+    """
+    This method enables all buttons in enemy's grid
+    :return: Nothing
+    """
     for x in range(border_height):
         for y in range(border_width):
             buttons_enemy[x][y]['state'] = 'normal'
 
 
-def checkOperationToPerform():
-    global l_game_status
+def getAttackInstruction():
+    """
+    This method run only once, and receives the instruction from server.
+    :return: Nothing
+    """
     instruction = clientsocket.recv(BUFFER)
+    performOperation(instruction)
+
+
+def sendInstruction(attackPosition):
+    """
+    This method sends the attack position to server.
+    :param attackPosition: Location to launch the attack.
+    :return: Nothing
+    """
+    clientsocket.send(attackPosition)
+
+
+def checkOperationToPerform():
+    """
+    This method receive two messages form server and send to performOperation method to perform task accordingly.
+    :return: Nothing
+    """
+    while True:
+        hit_or_miss = clientsocket.recv(BUFFER)
+        instruction = clientsocket.recv(BUFFER)
+        performOperation(hit_or_miss)
+        performOperation(instruction)
+
+
+def performOperation(instruction):
+    """
+    This method check instruction and perform task accordingly.
+    :param instruction: Task to perform
+    :return: Nothing
+    """
     if instruction == 'attack':
         # Player get chance to attack
-        # Get location from GUI and sends to server
-        l_game_status.config(text = "    Attak, It's your turn    ")
+        # Get location from GUI and sends to server.
+        l_game_status.config(text="    Attack, It's your turn    ")
         enable_enemy_grid()
     elif instruction == 'wait':
-        # It's player's opponent
-        # Disable GUI buttons
-        l_game_status.config(text = "    Wait It's your enemy's turn    ")
+        # It's player's opponent turn to attack.
+        l_game_status.config(text="    Wait It's your enemy's turn    ")
         disable_enemy_grid()
-        my_thread = threading.Thread(target=checkOperationToPerform)
-        my_thread.start()
+    # This instruction is received from server informing where hit or miss has occurred
+    # instruction starts with whether hit or miss has occurred
+    # followed by a number indicating which grid at client side should be reflected
+    # (2 for opponent 1 for player) followed by 2 numbers indicating position of attack
+    # followed by 2 numbers indicating number of ships sank of player 1(player) and 2(enemy) respectively
     elif instruction.startswith('hit'):
-        # Change GUI accordingly
+        # Change GUI accordingly to RED as it HIT.
+        # Check if this is HIT on player or opponent
         if instruction[3] == PLAYER:
-            # Changes in player board
-            print "HIT in player"
+            # Change player's board
             x = int(instruction[4])
             y = int(instruction[5])
             buttons_player[x][y].configure(bg='#fc0000')
         else:
             # Change enemy's board
-            print "HIT in enemy"
             x = int(instruction[4])
             y = int(instruction[5])
             buttons_enemy[x][y].configure(bg='#fc0000')
-        checkOperationToPerform()
+        l_player_status.configure(text="Your Ship sank - " + instruction[6])
+        l_enemy_status.configure(text="Enemy's Ship sank - " + instruction[7])
     elif instruction.startswith('miss'):
-        # Change GUI accordingly
+        # Change GUI accordingly to LIGHT BLUE as it's MISS.
+        # Check if this is MISS on player or opponent
         if instruction[4] == PLAYER:
             # Changes in player board
-            print "MISS in player"
             x = int(instruction[5])
             y = int(instruction[6])
             buttons_player[x][y].configure(bg='#00fce7')
         else:
             # Change enemy's board
-            print "MISS in enemy"
             x = int(instruction[5])
             y = int(instruction[6])
             buttons_enemy[x][y].configure(bg='#00fce7')
-        checkOperationToPerform()
+        l_player_status.configure(text="Your Ship sank - " + instruction[7])
+        l_enemy_status.configure(text="Enemy's Ship sank - " + instruction[8])
     elif instruction == 'win':
         # Game over and player wins the game
-        l_game_status.config(text = "    You won  !!! ")
+        l_game_status.config(text="    You won  !!!   ")
         clientsocket.close()
         return
     elif instruction == 'lost':
         # Game over and player lost the game
-        l_game_status.config(text = "    Sorry, You lost the game, Try again.   ")
+        l_game_status.config(text="   Sorry, You lost the game, Try again.  ")
         clientsocket.close()
         return
 
-# Connection Establishment
+
+# Connection Establishment with server
 try:
     clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     clientsocket.connect((ip_of_server, port))
@@ -110,26 +178,24 @@ except:
     print "Connection cannot be established.."
     sys.exit()
 
-server_ready = clientsocket.recv(BUFFER)   # Ready message from server
+# Ready message from server
+server_ready = clientsocket.recv(BUFFER)
 
 
-
-
-
-# GUI Event method
 def send_ready():
     """
     This method sends server a message when player is ready to start the game
     :return: Method returns nothing
     """
-    ship_locations = '11,12,13|51,61,71,81'  # This is the pattern which server accepts as ship's location
     clientsocket.send(ship_locations)
     disable_ready()
     disable_player_grid()
+    my_thread = threading.Thread(target=getAttackInstruction)
+    my_thread.start()
     my_thread = threading.Thread(target=checkOperationToPerform)
     my_thread.start()
 
-# GUI event method
+
 def player_board_fn(x, y):
     """
     This method is a handler of buttons in player's board.
@@ -137,10 +203,10 @@ def player_board_fn(x, y):
     :param y: x co-ordinate of location
     :return: Nothing
     """
-    print "On enemy Board " + str(x) + " , " + str(y)
+    # Settle ships here
+    pass
 
 
-# GUI event method
 def enemy_board_fn(x, y):
     """
     This method is a handler of buttons in enemy's board.
@@ -148,10 +214,8 @@ def enemy_board_fn(x, y):
     :param y: x co-ordinate of location
     :return: Nothing
     """
-    clientsocket.send('' + str(x) + str(y))
-    print "On enemy Board " + str(x) + " , " + str(y)
-    checkOperationToPerform()
-
+    send_thread = threading.Thread(target=sendInstruction, args=['' + str(x) + str(y)])
+    send_thread.start()
 
 
 # GUI rendering
@@ -204,4 +268,5 @@ for x in range(border_height):
         temp_buttons.append(b)
     buttons_enemy.append(temp_buttons)
 
+# Display GUI
 root.mainloop()

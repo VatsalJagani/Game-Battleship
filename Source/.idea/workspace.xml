@@ -15,10 +15,19 @@
       <file leaf-file-name="gui.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client/gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="19" lean-forward="true" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
+            <state relative-caret-position="133">
+              <caret line="264" column="23" lean-forward="true" selection-start-line="264" selection-start-column="23" selection-end-line="264" selection-end-column="23" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
+                <element signature="e#445#554#0" expanded="false" />
+                <element signature="e#581#687#0" expanded="false" />
+                <element signature="e#721#935#0" expanded="false" />
+                <element signature="e#1456#1665#0" expanded="false" />
+                <element signature="e#1700#1883#0" expanded="false" />
+                <element signature="e#1927#2108#0" expanded="false" />
+                <element signature="e#2146#2480#0" expanded="false" />
+                <marker date="1514525170610" expanded="false" signature="963:1179" ph="..." />
+                <marker date="1514525170610" expanded="false" signature="1207:1424" ph="..." />
               </folding>
             </state>
           </provider>
@@ -29,6 +38,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/client/test_gui_with_thread_optimization.py" />
+        <option value="$PROJECT_DIR$/client/gui_with_thread_optimization.py" />
         <option value="$PROJECT_DIR$/client/gui.py" />
       </list>
     </option>
@@ -54,8 +65,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -88,6 +97,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -119,6 +130,39 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Source" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/client/gui.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Unittests in gui_with_thread_optimization.py" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/client" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Source" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/client/gui_with_thread_optimization.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method />
+    </configuration>
+    <configuration default="false" name="gui_with_thread_optimization" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/client" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Source" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/client/gui_with_thread_optimization.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -188,12 +232,16 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method />
     </configuration>
-    <list size="1">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="Python.gui" />
+      <item index="1" class="java.lang.String" itemvalue="Python tests.Unittests in gui_with_thread_optimization.py" />
+      <item index="2" class="java.lang.String" itemvalue="Python.gui_with_thread_optimization" />
     </list>
     <recent_temporary>
-      <list size="1">
+      <list size="3">
         <item index="0" class="java.lang.String" itemvalue="Python.gui" />
+        <item index="1" class="java.lang.String" itemvalue="Python.gui_with_thread_optimization" />
+        <item index="2" class="java.lang.String" itemvalue="Python tests.Unittests in gui_with_thread_optimization.py" />
       </list>
     </recent_temporary>
   </component>
@@ -209,6 +257,11 @@
       <updated>1514381020088</updated>
     </task>
     <servers />
+  </component>
+  <component name="TestHistory">
+    <history-entry file="Unittests_in_test_gui_with_thread_optimization_py - 2017.12.28 at 18h 56m 40s.xml">
+      <configuration name="Unittests in test_gui_with_thread_optimization.py" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
@@ -244,10 +297,46 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/client/gui.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="901">
+          <caret line="53" column="32" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="205" selection-end-column="15" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+            <element signature="e#445#554#0" expanded="false" />
+            <element signature="e#581#687#0" expanded="false" />
+            <element signature="e#721#935#0" expanded="false" />
+            <element signature="e#1456#1665#0" expanded="false" />
+            <element signature="e#1700#1883#0" expanded="false" />
+            <element signature="e#1927#2108#0" expanded="false" />
+            <element signature="e#2146#2480#0" expanded="false" />
+            <marker date="1514525170610" expanded="false" signature="963:1179" ph="..." />
+            <marker date="1514525170610" expanded="false" signature="1207:1424" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/gui_with_thread_optimization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="12" column="19" lean-forward="true" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/gui.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
+            <element signature="e#445#554#0" expanded="false" />
+            <element signature="e#581#687#0" expanded="false" />
+            <element signature="e#721#935#0" expanded="false" />
+            <element signature="e#1456#1665#0" expanded="false" />
+            <element signature="e#1700#1883#0" expanded="false" />
+            <element signature="e#1927#2108#0" expanded="false" />
+            <element signature="e#2146#2480#0" expanded="false" />
+            <marker date="1514525170610" expanded="false" signature="963:1179" ph="..." />
+            <marker date="1514525170610" expanded="false" signature="1207:1424" ph="..." />
           </folding>
         </state>
       </provider>
@@ -284,7 +373,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/server_connection.py">
+    <entry file="file://$PROJECT_DIR$/client/client_connection.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -292,7 +381,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/client_connection.py">
+    <entry file="file://$PROJECT_DIR$/client/gui_with_thread_optimization.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="12" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="226" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/server_connection.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -302,10 +399,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/client/gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="19" lean-forward="true" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
+        <state relative-caret-position="133">
+          <caret line="264" column="23" lean-forward="true" selection-start-line="264" selection-start-column="23" selection-end-line="264" selection-end-column="23" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
+            <element signature="e#445#554#0" expanded="false" />
+            <element signature="e#581#687#0" expanded="false" />
+            <element signature="e#721#935#0" expanded="false" />
+            <element signature="e#1456#1665#0" expanded="false" />
+            <element signature="e#1700#1883#0" expanded="false" />
+            <element signature="e#1927#2108#0" expanded="false" />
+            <element signature="e#2146#2480#0" expanded="false" />
+            <marker date="1514525170610" expanded="false" signature="963:1179" ph="..." />
+            <marker date="1514525170610" expanded="false" signature="1207:1424" ph="..." />
           </folding>
         </state>
       </provider>
