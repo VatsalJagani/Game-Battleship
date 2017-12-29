@@ -1,0 +1,4 @@
+player should wait untill second client connects, so both player should aware of each other.
+
+list of concepts and modules used.
+
