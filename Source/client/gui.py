@@ -1,6 +1,6 @@
 import Tkinter as tk
 import socket
-import sys
+import os
 import threading
 
 border_width = 10
@@ -466,4 +466,4 @@ connection.start()
 # Display GUI
 root.resizable(width=False, height=False)
 root.mainloop()
-sys.exit(0)
+os._exit(0)
