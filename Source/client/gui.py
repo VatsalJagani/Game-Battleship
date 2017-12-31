@@ -19,7 +19,7 @@ ready_button = None
 l_game_status = None
 l_player_status = None
 l_enemy_status = None
-ship_locations = ''  # This is the pattern which server accepts as ship's location
+ship_locations = []  # Player's ships' locations
 direction = 'h'
 button_disable_flags = []
 
@@ -214,8 +214,18 @@ def send_ready():
     horizontal_button['state'] = 'disabled'
     vertical_button['state'] = 'disabled'
     reset_button['state'] = 'disabled'
-    clientsocket.send(ship_locations)
     disable_ready()
+
+    ships = ''
+    for ship in ship_locations:
+        for loc in ship:
+            ships += loc
+            ships += ','
+        ships = ships[0:-1]
+        ships += '|'
+    ships = ships[0:-1]
+    clientsocket.send(ships)
+
     l_game_status.configure(text='Waiting for oppenent to be ready!')
     disable_player_grid()
     my_thread = threading.Thread(target=getAttackInstruction)
@@ -230,7 +240,7 @@ def resetshipposition():
     :return:
     """
     global shipsettleflag, ready_flag, l_game_status, ship_locations
-    ship_locations = ""
+    ship_locations = []
     ready_flag = False
     shipsettleflag = 3
     l_game_status.config(text='Select ship of 4 blocks')
@@ -245,14 +255,9 @@ def player_board_fn(x, y):
     :return: Nothing
     """
     # Settle ships here
-    global direction
-    if direction == 'h':
-        sethorizontalposition(x, y)
-    if direction == 'v':
-        setverticalposition(x, y)
-
-
-def setverticalposition(x, y):
+    set_ship_position(x, y)
+    
+def set_ship_position(x, y):
     """
     This function sets ships positions vertically based on x & y
     :param x:
@@ -261,91 +266,71 @@ def setverticalposition(x, y):
     """
     global shipsettleflag
     global ready_flag
-    global ship_locations
 
     # validates x & y and sets 4 block of ship vertically
     if shipsettleflag == 3:
-        if x + 3 > 9 or y > 9:
-            return
-        shipsettleflag = shipsettleflag - 1
-        l_game_status.config(text="Select ship of 3 blocks")
-        for i in range(4):
-            if i == 3:
-                ship_locations = ship_locations + str(x + i) + str(y) + '|'
-            else:
-                ship_locations = ship_locations + str(x + i) + str(y) + ','
-            buttons_player[x + i][y].configure(bg='#0000ff')
-            buttons_player[x + i][y]['state'] = 'disabled'
+        if set_ship(4,x,y):
+            shipsettleflag = shipsettleflag - 1
+            l_game_status.config(text="Select ship of 3 blocks")
     # validates x & y and sets 3 block of ship vertically
     elif shipsettleflag == 2:
-        if x + 2 > 9 or y > 9:
-            return
-        shipsettleflag = shipsettleflag - 1
-        l_game_status.config(text="Select ship of 1 blocks")
-        for i in range(3):
-            if i == 2:
-                ship_locations = ship_locations + str(x + i) + str(y) + '|'
-            else:
-                ship_locations = ship_locations + str(x + i) + str(y) + ','
-            buttons_player[x + i][y].configure(bg=ship_color)
-            buttons_player[x + i][y]['state'] = 'disabled'
+        if set_ship(3,x,y):
+            shipsettleflag = shipsettleflag - 1
+            l_game_status.config(text="Select ship of 1 blocks")
     # sets 1 block of ship vertically
     elif shipsettleflag == 1:
-        shipsettleflag = shipsettleflag - 1
-        ship_locations = ship_locations + str(x) + str(y)
-        l_game_status.config(text="Ready")
-        buttons_player[x][y].configure(bg=ship_color)
-        buttons_player[x][y]['state'] = 'disabled'
-        ready_flag = True
+        if set_ship(1,x,y):
+            shipsettleflag = shipsettleflag - 1
+            l_game_status.config(text="Ready")
+            ready_flag = True
+            
+def set_ship(ship_length, x, y):
+    global direction
+    if direction == 'h':       
+        return set_ship_horizontal(ship_length, x, y)
+    else:
+        return set_ship_vertical(ship_length, x, y)
 
 
-def sethorizontalposition(x, y):
-    """
-    This function sets ships positions horizontally based on x & y
-    :param x:
-    :param y:
-    :return:
-    """
-    global shipsettleflag
-    global ready_flag
-    global ship_locations
+def set_ship_horizontal(ship_length, x, y):
+    if x + ship_length - 1 > border_height:
+        return
+    ship = []
+    for i in range(ship_length):
+        loc = str(x + i) + str(y)
+        if is_already_in_list(loc):
+            return False
+    for i in range(ship_length):
+        loc = str(x + i) + str(y)
+        ship.append(loc)
+        buttons_player[x + i][y].configure(bg=ship_color)
+        buttons_player[x + i][y]['state'] = 'disabled'
+    ship_locations.append(ship)
+    return True
+    
+def set_ship_vertical(ship_length, x, y):
+    if y + ship_length - 1 > border_width:
+        return
+    ship = []
+    for i in range(ship_length):
+        loc = str(x) + str(y + i)
+        if is_already_in_list(loc):
+            return False
+    for i in range(ship_length):
+        loc = str(x) + str(y + i)
+        ship.append(loc)
+        buttons_player[x][y + i].configure(bg=ship_color)
+        buttons_player[x][y + i]['state'] = 'disabled'
+    ship_locations.append(ship)
+    return True    
 
-    # validates x & y and sets 4 block of ship vertically
-    if shipsettleflag == 3:
-        if x > 9 or y + 3 > 9:
-            return
-        shipsettleflag = shipsettleflag - 1
-        l_game_status.config(text="Select ship of 3 blocks")
-        for i in range(4):
-            if i == 3:
-                ship_locations = ship_locations + str(x) + str(y + i) + '|'
-            else:
-                ship_locations = ship_locations + str(x) + str(y + i) + ','
-            buttons_player[x][y + i].configure(bg='#0000ff')
-            buttons_player[x][y + i]['state'] = 'disabled'
-    # validates x & y and sets 3 block of ship vertically
-    elif shipsettleflag == 2:
-        if x > 9 or y + 2 > 9:
-            return
-        shipsettleflag = shipsettleflag - 1
-        l_game_status.config(text="Select ship of 1 blocks")
-        for i in range(3):
-            if i == 2:
-                ship_locations = ship_locations + str(x) + str(y + i) + '|'
-            else:
-                ship_locations = ship_locations + str(x) + str(y + i) + ','
-            buttons_player[x][y + i].configure(bg='#0000ff')
-            buttons_player[x][y + i]['state'] = 'disabled'
-    # sets 1 block of ship vertically
-    elif shipsettleflag == 1:
-        shipsettleflag = shipsettleflag - 1
-        ship_locations = ship_locations + str(x) + str(y)
-        l_game_status.config(text="Ready")
-        buttons_player[x][y].configure(bg='#0000ff')
-        buttons_player[x][y]['state'] = 'disabled'
-        ready_flag = True
-
-
+def is_already_in_list(location):
+    for ship in ship_locations:
+        for loc in ship:
+            if location == loc:
+                return True
+    return False
+    
 def setvertical():
     """
     sets direction to vertical to set ship positions
@@ -401,7 +386,6 @@ def connect_to_server():
         enable_ready()
         l_game_status.config(text="Select ship of 4 blocks")
     except Exception as e:
-        print e.message
         l_game_status.configure(text="Connection cannot be established..")
 
 
