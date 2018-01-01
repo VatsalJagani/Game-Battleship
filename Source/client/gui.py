@@ -33,6 +33,7 @@ hit_color = '#fc0000'
 miss_color = '#00fce7'
 ship_color = '#0000ff'
 
+
 def disable_ready():
     """
     This method disables ready button
@@ -256,45 +257,61 @@ def player_board_fn(x, y):
     """
     # Settle ships here
     set_ship_position(x, y)
-    
+
+
 def set_ship_position(x, y):
     """
     This function sets ships positions vertically based on x & y
     :param x:
     :param y:
-    :return:
+    :return: Nothing
     """
     global shipsettleflag
     global ready_flag
 
     # validates x & y and sets 4 block of ship vertically
     if shipsettleflag == 3:
-        if set_ship(4,x,y):
+        if set_ship(4, x, y):
             shipsettleflag = shipsettleflag - 1
             l_game_status.config(text="Select ship of 3 blocks")
     # validates x & y and sets 3 block of ship vertically
     elif shipsettleflag == 2:
-        if set_ship(3,x,y):
+        if set_ship(3, x, y):
             shipsettleflag = shipsettleflag - 1
             l_game_status.config(text="Select ship of 1 blocks")
     # sets 1 block of ship vertically
     elif shipsettleflag == 1:
-        if set_ship(1,x,y):
+        if set_ship(1, x, y):
             shipsettleflag = shipsettleflag - 1
             l_game_status.config(text="Ready")
             ready_flag = True
-            
+
+
 def set_ship(ship_length, x, y):
+    """
+    This function calls the utility function to set the ship on the board based on the direction selected by user.
+    :param ship_length:
+    :param x: Ship co-ordinate X
+    :param y: Ship co-ordinate Y
+    :return: Boolean flag, whether ship is at proper position or not.
+    """
     global direction
-    if direction == 'h':       
+    if direction == 'h':
         return set_ship_horizontal(ship_length, x, y)
     else:
         return set_ship_vertical(ship_length, x, y)
 
 
-def set_ship_horizontal(ship_length, x, y):
-    if x + ship_length - 1 > border_height:
-        return
+def set_ship_vertical(ship_length, x, y):
+    """
+    This function sets the ship horizontal on the board.
+    :param ship_length: Length of the ship.
+    :param x: Ship co-ordinate X
+    :param y: Ship co-ordinate Y
+    :return: Boolean flag, whether ship is at proper position or not.
+    """
+    if x + ship_length > border_width:
+        return False
     ship = []
     for i in range(ship_length):
         loc = str(x + i) + str(y)
@@ -307,10 +324,18 @@ def set_ship_horizontal(ship_length, x, y):
         buttons_player[x + i][y]['state'] = 'disabled'
     ship_locations.append(ship)
     return True
-    
-def set_ship_vertical(ship_length, x, y):
-    if y + ship_length - 1 > border_width:
-        return
+
+
+def set_ship_horizontal(ship_length, x, y):
+    """
+    This function sets the ship vertically on the board.
+    :param ship_length: Length of the ship.
+    :param x: Ship co-ordinate X
+    :param y: Ship co-ordinate Y
+    :return: Boolean flag, whether ship is at proper position or not.
+    """
+    if y + ship_length > border_height:
+        return False
     ship = []
     for i in range(ship_length):
         loc = str(x) + str(y + i)
@@ -322,19 +347,27 @@ def set_ship_vertical(ship_length, x, y):
         buttons_player[x][y + i].configure(bg=ship_color)
         buttons_player[x][y + i]['state'] = 'disabled'
     ship_locations.append(ship)
-    return True    
+    return True
+
 
 def is_already_in_list(location):
+    """
+    This function checks whether any cordinate selected is already in any ship or not.
+    In short any ship should not set up on other ship.
+    :param location: Location of ship.
+    :return: Boolean flag, whether ship is colloids with any other ship or not.
+    """
     for ship in ship_locations:
         for loc in ship:
             if location == loc:
                 return True
     return False
-    
+
+
 def setvertical():
     """
     sets direction to vertical to set ship positions
-    :return:
+    :return: Nothing
     """
     global horizontal_button, direction
     direction = 'v'
@@ -345,7 +378,7 @@ def setvertical():
 def sethorizontal():
     """
     sets direction to horizontal to set ship positions
-    :return:
+    :return: Nothing
     """
     global vertical_button, direction
     horizontal_button['state'] = 'disabled'
@@ -372,7 +405,7 @@ def connect_to_server():
     Connection Establishment with server
     :return: Nothing
     """
-    global clientsocket
+    global clientsocket, reset_button, vertical_button
     try:
         clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientsocket.connect((ip_of_server, port))
@@ -384,6 +417,8 @@ def connect_to_server():
         # Set game status to select ship position
         enable_player_grid()
         enable_ready()
+        reset_button['state'] = 'normal'
+        vertical_button['state'] = 'normal'
         l_game_status.config(text="Select ship of 4 blocks")
     except Exception as e:
         l_game_status.configure(text="Connection cannot be established..")
@@ -437,7 +472,9 @@ horizontal_button.grid(row=4, column=0, padx=15, pady=1)
 horizontal_button['state'] = 'disabled'
 vertical_button = tk.Button(fr_2, text="Vertical", height=2, width=10, command=setvertical)
 vertical_button.grid(row=5, column=0, padx=15, pady=1)
+vertical_button['state'] = 'disabled'
 reset_button = tk.Button(fr_2, text="Reset", height=2, width=10, command=resetshipposition)
+reset_button['state'] = 'disabled'
 reset_button.grid(row=6, column=0, padx=15, pady=5)
 fr_3 = tk.Frame(fr_lower, bg=bg_color)
 fr_3.grid(row=0, column=7, columnspan=5, padx=10)
