@@ -22,7 +22,12 @@ def getshiplocation(conn, player):
     :return:
     """
     global no_ship
-    positions = str(conn.recv(512)).strip()
+    positions = ''
+    try:
+        positions = str(conn.recv(512)).strip()
+    except:
+        print "Error : Player is not reachable."
+        return
     positionlist = positions.split("|")
     if player == 1:
         for i in positionlist:
@@ -44,6 +49,7 @@ def establishconnection(serversocket):
     playerconn1, addr = serversocket.accept()
     playerconn2, addr = serversocket.accept()
     sendready()
+    print "Both player connected."
 
 
 def sendready():
@@ -60,7 +66,6 @@ def closeconn():
     game_running_flag = False
     playerconn1.close()
     playerconn2.close()
-
 
 def checkwin(player):
     """
@@ -117,66 +122,70 @@ def getattackposition(conn, player):
     """
     global shipsankplayer1
     global shipsankplayer2
-    while True:
-        pos = conn.recv(512)
-        if game_running_flag == False:
-            return
-        if player == 1:
-            if checkhit(pos, player):
-                # This instruction is sent to both client informing where hit or miss has occurred
-                # instruction starts with whether hit or miss has occurred
-                # followed by a number indicating which grid at client side should be reflected
-                # (2 for opponent 1 for player) followed by 2 numbers indicating position of attack
-                # followed by 2 numbers indicating number of ships sank of player and opponent respectively
-                shipsankplayer2=str(no_ship-len(player2List))
-                playerconn1.send("hit2" + pos+shipsankplayer1+shipsankplayer2)
-                playerconn2.send("hit1" + pos+shipsankplayer2+shipsankplayer1)
-                if checkwin(player):
-                    return
-                playerconn1.send("attack")
-                playerconn2.send("wait")
+    try:
+        while True:
+            pos = conn.recv(512)
+            if game_running_flag == False:
+                return
+            if player == 1:
+                if checkhit(pos, player):
+                    # This instruction is sent to both client informing where hit or miss has occurred
+                    # instruction starts with whether hit or miss has occurred
+                    # followed by a number indicating which grid at client side should be reflected
+                    # (2 for opponent 1 for player) followed by 2 numbers indicating position of attack
+                    # followed by 2 numbers indicating number of ships sank of player and opponent respectively
+                    shipsankplayer2=str(no_ship-len(player2List))
+                    playerconn1.send("hit2" + pos+shipsankplayer1+shipsankplayer2)
+                    playerconn2.send("hit1" + pos+shipsankplayer2+shipsankplayer1)
+                    if checkwin(player):
+                        return
+                    playerconn1.send("attack")
+                    playerconn2.send("wait")
+                else:
+                    playerconn1.send("miss2" + pos+shipsankplayer1+shipsankplayer2)
+                    playerconn2.send("miss1" + pos+shipsankplayer2+shipsankplayer1)
+                    playerconn1.send("wait")
+                    playerconn2.send("attack")
             else:
-                playerconn1.send("miss2" + pos+shipsankplayer1+shipsankplayer2)
-                playerconn2.send("miss1" + pos+shipsankplayer2+shipsankplayer1)
-                playerconn1.send("wait")
-                playerconn2.send("attack")
-        else:
-            if checkhit(pos, player):
-                shipsankplayer1 = str(no_ship - len(player1List))
-                playerconn1.send("hit1" + pos+shipsankplayer1+shipsankplayer2)
-                playerconn2.send("hit2" + pos+shipsankplayer2+shipsankplayer1)
-                if checkwin(player):
-                    return
-                playerconn1.send("wait")
-                playerconn2.send("attack")
-            else:
-                playerconn1.send("miss1" + pos+shipsankplayer1+shipsankplayer2)
-                playerconn2.send("miss2" + pos+shipsankplayer2+shipsankplayer1)
-                playerconn1.send("attack")
-                playerconn2.send("wait")
+                if checkhit(pos, player):
+                    shipsankplayer1 = str(no_ship - len(player1List))
+                    playerconn1.send("hit1" + pos+shipsankplayer1+shipsankplayer2)
+                    playerconn2.send("hit2" + pos+shipsankplayer2+shipsankplayer1)
+                    if checkwin(player):
+                        return
+                    playerconn1.send("wait")
+                    playerconn2.send("attack")
+                else:
+                    playerconn1.send("miss1" + pos+shipsankplayer1+shipsankplayer2)
+                    playerconn2.send("miss2" + pos+shipsankplayer2+shipsankplayer1)
+                    playerconn1.send("attack")
+                    playerconn2.send("wait")
+    except:
+        print "Error : Player forcefully terminated connection."
 
 
-try:
-    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # creates a server which listens to port 1234
-    serversocket.bind(('0.0.0.0', 1234))
-    serversocket.listen(0)
-    establishconnection(serversocket)  # establishing connection to both clients
-    t1 = threading.Thread(target=getshiplocation,
-                          args=[playerconn1, 1])  # Creates threads for both players which wait for
-    t2 = threading.Thread(target=getshiplocation, args=[playerconn2, 2])  # client to send ship locations
-    t1.start()
-    t2.start()
-    t1.join()
-    t2.join()
-    playerconn1.send("attack")  # Sends attack instruction to player 1
-    playerconn2.send("wait")  # Sends wait instruction to player 2
-    t1 = threading.Thread(target=getattackposition,
-                          args=[playerconn1, 1])  # Creates threads for both players which wait for
-    t2 = threading.Thread(target=getattackposition, args=[playerconn2, 2])  # client to send attack location
-    t1.start()
-    t2.start()
-    t1.join()
-    t2.join()
-    print "Game Over"
-except Exception as e:
-    print e.message
+while True:
+    try:
+        serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # creates a server which listens to port 1234
+        serversocket.bind(('0.0.0.0', 1234))
+        serversocket.listen(0)
+        establishconnection(serversocket)  # establishing connection to both clients
+        t1 = threading.Thread(target=getshiplocation,
+                              args=[playerconn1, 1])  # Creates threads for both players which wait for
+        t2 = threading.Thread(target=getshiplocation, args=[playerconn2, 2])  # client to send ship locations
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+        playerconn1.send("attack")  # Sends attack instruction to player 1
+        playerconn2.send("wait")  # Sends wait instruction to player 2
+        t1 = threading.Thread(target=getattackposition,
+                              args=[playerconn1, 1])  # Creates threads for both players which wait for
+        t2 = threading.Thread(target=getattackposition, args=[playerconn2, 2])  # client to send attack location
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+        print "Game Over"
+    except Exception as e:
+        print e.message
