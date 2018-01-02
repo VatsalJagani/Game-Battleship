@@ -279,10 +279,10 @@ def set_ship_position(x, y):
     elif shipsettleflag == 2:
         if set_ship(3, x, y):
             shipsettleflag = shipsettleflag - 1
-            l_game_status.config(text="Select ship of 1 blocks")
+            l_game_status.config(text="Select ship of 2 blocks")
     # sets 1 block of ship vertically
     elif shipsettleflag == 1:
-        if set_ship(1, x, y):
+        if set_ship(2, x, y):
             shipsettleflag = shipsettleflag - 1
             l_game_status.config(text="Ready")
             ready_flag = True

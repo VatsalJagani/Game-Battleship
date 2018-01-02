@@ -9,6 +9,11 @@ This is Battleship Game in Python.
 2. Player has to guess enemy's corordinate to attack, If at that position enemy's ship is found then hit will be marked else miss.
 3. Player wins when all enemy's ships are taken down.
 
+Over here there are 3 ships, their length and name are as below:
+	1. Length:4 Name:Distroyer
+	2. Length:3 Name:Equalizer
+	3. Length:2 Name:Tiger of the Ocean
+
 ## How to start the Game ?
 ### Start Server
 Run Source/server/server_connection.py file with one command line argument port number on which you want to start the server.
