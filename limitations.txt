@@ -1,3 +1,7 @@
+User/Player is not given chance to select their selected opponent.
+ - Opponent is selected by server without asking player.
+ 
+
 Restart functionality is not available fully.
   - Server need not to be restarted.
   - Player need to restart the game(gui) on both the player's end.
