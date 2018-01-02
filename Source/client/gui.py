@@ -2,6 +2,7 @@ import Tkinter as tk
 import socket
 import os
 import threading
+import sys
 
 border_width = 10
 border_height = 10
@@ -9,8 +10,8 @@ PLAYER = '1'
 ENEMY = '2'
 ready_flag = False
 BUFFER = 512
-ip_of_server = '127.0.0.1'
-port = 1234
+ip_of_server = '127.0.0.1'      # Ip address will taken as command line argument.
+port = 1234     # Port will taken as command line argument.
 clientsocket = None
 shipsettleflag = 3
 buttons_player = []
@@ -421,8 +422,19 @@ def connect_to_server():
         vertical_button['state'] = 'normal'
         l_game_status.config(text="Select ship of 4 blocks")
     except Exception as e:
+        print e
+        print e.message
+        print e.args
         l_game_status.configure(text="Connection cannot be established..")
 
+
+# Take command line argument Ip & Port of server.
+try:
+    ip_of_server = sys.argv[1]
+    port = int(sys.argv[2])
+except:
+    print "Please enter valid IP address and port number."
+    sys.exit()
 
 # GUI rendering
 root = tk.Tk()

@@ -1,5 +1,6 @@
 import socket
 import threading
+import sys
 
 
 class Game:
@@ -203,8 +204,13 @@ class Game:
 
 # Server runs continuously to serve multi-game functionality.
 try:
+    port = int(sys.argv[1])
+except:
+    print "Please enter valid port number."
+    sys.exit()
+try:
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # creates a server which listens to port 1234
-    serversocket.bind(('0.0.0.0', 1234))
+    serversocket.bind(('0.0.0.0', port))
     serversocket.listen(0)
     print "server started.."
     while True:
