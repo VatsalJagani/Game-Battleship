@@ -1,9 +1,7 @@
 Restart functionality is not available fully.
   - Server need not to be restarted.
   - Player need to restart the game(gui) on both the player's end.
+
   
 If one player manually forcefully terminates the game other player is not notified about that status.  
-
-No Multi-Game Functionality
-  - Server can handle only one game(two players).
-  - If multiple players are trying to get connected with server at a time then first two will be given a chance to play the game.
+  - In above case server will response player's opponent who forcefully terminates the game.
